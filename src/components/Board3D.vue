@@ -190,47 +190,18 @@ export default {
 
       this.scene = new Three.Scene();
       this.scene.background = new Three.Color( 0x000000 );
-
-
-      var textureGlow  = Three.ImageUtils.loadTexture('images/textures/led1.png');
-      var texturePoint = Three.ImageUtils.loadTexture('images/textures/led4.png');
-      var textureOff   = Three.ImageUtils.loadTexture('images/textures/ledoff.png');
-
-      this.materialGlow  = new Three.SpriteMaterial({ map: textureGlow,  color: 0x0, transparent: true } );
-      this.materialPoint = new Three.SpriteMaterial({ map: texturePoint, color: 0x0, transparent: true } );
-      this.materialOff   = new Three.SpriteMaterial({ map: textureOff,   color: 0xffffff, transparent: true, opacity: 0.2} );
-
-      // grid
-      this.gridHelper = new Three.GridHelper( 1000, 20 );
-      //this.scene.add( this.gridHelper );
-
-      //un cube
-      //let geometry = new Three.BoxGeometry(1000/32, 1000/32, 1000/32);
-      //let material = new Three.MeshNormalMaterial();
-
-      this.cubeGeo = new Three.BoxBufferGeometry( 50, 50, 50 );
-      this.cubeMaterial = new Three.MeshLambertMaterial( { color: 0xfeb74c, map: new Three.TextureLoader().load( 'square-outline-textured.png' ) } );
-      //this.raycaster = new Three.Raycaster();
-      //this.mouse = new Three.Vector2();
-
-      // plan pour detecter la collision
-      //let planegeometry = new Three.PlaneBufferGeometry( 1000, 1000 );
-      //planegeometry.rotateX( - Math.PI / 2 );
-      //this.plane = new Three.Mesh( planegeometry, new Three.MeshBasicMaterial( { visible: false } ) );
-      //this.scene.add( this.plane );
-      //this.objects.push( this.plane );
-
-      // lights
-      //var ambientLight = new Three.AmbientLight( 0x606060 );
-      //this.scene.add( ambientLight );
-
-      //var directionalLight = new Three.DirectionalLight( 0xffffff );
-      //directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
-      //this.scene.add( directionalLight );
+      this.scene.add(this.camera);
 
       this.renderer = new Three.WebGLRenderer({antialias: true});
       this.renderer.setSize(container.clientWidth, container.clientHeight);
+
+      this.container.appendChild(this.renderer.domElement);
+
+
       this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+
+
+
 
         // floor
       this.floorMaterial = new Three.MeshPhongMaterial({
@@ -241,8 +212,15 @@ export default {
       this.floor = new Three.Mesh(this.floorGeometry, this.floorMaterial);
       this.floor.position.y = this.offset_y - 30;
       this.floor.rotation.x = -Math.PI / 2;
-      //this.scene.add(this.floor);
+      this.scene.add(this.floor);
 
+      var textureGlow  = Three.ImageUtils.loadTexture('images/textures/led1.png');
+      var texturePoint = Three.ImageUtils.loadTexture('images/textures/led4.png');
+      var textureOff   = Three.ImageUtils.loadTexture('images/textures/ledoff.png');
+
+      this.materialGlow  = new Three.SpriteMaterial({ map: textureGlow,  color: 0x0, transparent: true } );
+      this.materialPoint = new Three.SpriteMaterial({ map: texturePoint, color: 0x0, transparent: true } );
+      this.materialOff   = new Three.SpriteMaterial({ map: textureOff,   color: 0xffffff, transparent: true, opacity: 0.2} );
 
       for ( z = 0; z < this.resZ; z++) {
         for ( y = 0; y < this.resY; y++) {
@@ -269,10 +247,6 @@ export default {
         }
       }
 
-
-      container.appendChild(this.renderer.domElement);
-
-      //this.updateDimensions();
     },
 
     onWindowResize(){
@@ -356,7 +330,8 @@ export default {
         // turn on the LED
         this.scene.children[i].material = this.materialPoint.clone();
         this.scene.children[i].material.color.setHex(color);
-        var hsl = this.scene.children[i].material.color.getHSL();
+        var hsl={};
+        this.scene.children[i].material.color.getHSL(hsl);
         this.scene.children[i].material.color.setHSL(hsl.h, hsl.s, 0.7);
 
         this.scene.children[i+1].material.opacity = 1;
@@ -365,6 +340,7 @@ export default {
 
       // update the light
       var light = this.scene.children[2 + this.resX*this.resY*this.resZ*2 + x + z*this.resZ];
+      if(!light) return;
       var lightOff = true;
 
       for (var yy = 0; yy < this.resY; yy++) {
