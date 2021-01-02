@@ -404,7 +404,7 @@ export default {
   },
   mounted() {
     this.init();
-    //this.animate();
+    this.animate();
   },
   created(){
     window.addEventListener('resize', () => {this.onWindowResize()})
