@@ -49,7 +49,7 @@ export default {
     selectedLanguage: 'fr',
     isLangSelectOpen: false,
     languages: [
-      'it','fr'
+      'us','fr'
     ]
 
   }),
